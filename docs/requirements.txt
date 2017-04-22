@@ -1,0 +1,9 @@
+a program that will read a given set of IPs, perform Geo IP and RDAP lookups, and accept a query to filter results.
+
+GeoIP/RDAP/Filter/Parsing Components
+
+parse a text file containing 5000 IP addresses spread throughout random text.
+
+filter component provides custom query language
+
+No 3rd party packages for GeoIP, RDAP, filtering.
