@@ -1,14 +1,13 @@
 import sys
 import re
 
-regex = re.compile("""((?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]?[0-9])\.(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]?[0-9])\.(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]?[0-9])\.(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]?[0-9]))""")
+regex = re.compile("((?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]?[0-9])\."
+                   "(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]?[0-9])\."
+                   "(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]?[0-9])\."
+                   "(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]?[0-9]))")
 
 def parseChunk(inputStr):
-    addressList = []
-    matches = regex.findall(inputStr)
-    for address in matches:
-        addressList.append(address)
-    return addressList
+    return regex.findall(inputStr)
 
 if __name__ == '__main__':
     filename = None
@@ -22,18 +21,15 @@ if __name__ == '__main__':
     else:
         chunk = inFile.read(1024)
         while chunk:
-            addresses = []
-            addresses = parseChunk(chunk)
-            if addresses:
-                 ipaddresses.append(addresses)
+            ipaddresses += parseChunk(chunk)
             #backtrack 16 bytes so we can't miss an IP
             #by splitting it during the read
             if len(chunk) == 1024:
                 inFile.seek(-16, 1)
             chunk = inFile.read(1024)
 
-    print ipaddresses
+    print set(ipaddresses)
     try:
-        infile.close()
+        inFile.close()
     except Exception as e:
         print e
