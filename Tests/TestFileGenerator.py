@@ -3,7 +3,7 @@ import random
 import string
 
 def generateSomeCharacters():
-    return ''.join(random.sample(string.ascii_letters, random.randint(0,9)))
+    return ''.join(random.sample(string.ascii_letters + string.digits, random.randint(0,9)))
 
 if __name__ == '__main__':
     outfilename = "TestInput-" + datetime.now().strftime("%d-%m-%y-%H-%M-%S")
