@@ -15,6 +15,5 @@ class GeoIP(object):
         return [self.getLocationDict(x) for x in ipList]
 
     def getLocationDict(self, ip):
-        print "getting info for", ip
         jsonInfo = self.getRawLocationInfo(ip, dataFmt='json')
         return json.loads(jsonInfo.text.encode('ascii','ignore'))
