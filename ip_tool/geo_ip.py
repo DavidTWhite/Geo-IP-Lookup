@@ -25,3 +25,6 @@ class GeoIP(object):
             returnDict['ip'] = ip
             returnDict['GeoIPError'] = str(e)
         return returnDict
+
+class LocalGeoIPProvider(object):
+    pass
