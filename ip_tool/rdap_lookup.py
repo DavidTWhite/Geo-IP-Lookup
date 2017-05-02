@@ -14,6 +14,7 @@ class RDAPLookup(object):
             returnDict = json.loads(jsonData.text.encode('ascii','ignore'))
         except Exception as e:
             returnDict['RDAPError'] = str(e)
+        returnDict['ip'] = ip
         return returnDict
 
     def getBulkRDAPInfo(self, ipList):

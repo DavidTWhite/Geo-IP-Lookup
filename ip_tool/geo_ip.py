@@ -1,7 +1,7 @@
 import requests
 import json
 import abc
-import geopip2.database as geodb
+import geoip2.database as geodb
 
 class GeoIP(object):
     """Make requests for geo IP lookups from freegeoip.net"""
@@ -28,6 +28,19 @@ class GeoIP(object):
             returnDict['GeoIPError'] = str(e)
         return returnDict
 
+class BaseGEOIPProvider(object):
+    __metaclass__ = abc.ABCMeta
+
+    @abc.abstractmethod
+    def getCity(self, ip): return
+
+    @abc.abstractmethod
+    def getCountry(self, ip): return
+
+    @abc.abstractmethod
+    def getLatLon(self, ip): return
+
+
 class FreeGeoIPProvider(BaseGEOIPProvider):
     """ Make requests to the freegeoip.net API for IP information """
     def getLocationDict(self, ip):
@@ -35,15 +48,14 @@ class FreeGeoIPProvider(BaseGEOIPProvider):
         return json.loads(jsonInfo.text.encode('ascii','ignore'))
 
     def getCity(self, ip):
-        return self.getLocationDict(ip)['city']
+        return (self.getLocationDict(ip))['city']
 
     def getCountry(self, ip):
-        return self.cityDB.city(ip).city.country.name
+        return (self.getLocationDict(ip))['country_name']
 
     def getLatLon(self, ip):
-        return (self.cityDB.city(ip).location.latitude,
-                self.cityDB.city(ip).location.longitude,
-                self.cityDB.city(ip).location.accuracy_radius)
+        jsonDict = self.getLocationDict(ip)
+        return (jsonDict['latitude'], jsonDict['longitude'], None)
 
 class MaxMindIPProvider(BaseGEOIPProvider):
     """ Access a maxmind geoip2 City database for IP information """
@@ -63,21 +75,3 @@ class MaxMindIPProvider(BaseGEOIPProvider):
         return (self.cityDB.city(ip).location.latitude,
                 self.cityDB.city(ip).location.longitude,
                 self.cityDB.city(ip).location.accuracy_radius)
-
-class BaseGEOIPProvider(object):
-    __metaclass__ = abc.ABCMeta
-
-    @abc.abstractmethod
-    def getCity(self, ip): return
-
-    @abc.abstractmethod
-    def getCountry(self, ip): return
-
-    @abc.abstractmethod
-    def getLatLon(self, ip): return
-
-    @abc.abstractmethod
-    def getContinent(self, ip): return
-
-    @abc.abstractmethod
-    def getLocationSubdivisions(self, ip): return
