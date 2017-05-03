@@ -45,14 +45,17 @@ if __name__ == '__main__':
         filename = raw_input("Please enter a filename to parse IP Addresses from: ")
     parser = FileParser()
     ipAddresses = parser.parseFile(filename)
-    print len(ipAddresses), "IP addresses found in file. Performing RDAP Lookup"
-    results = rdapLookup(ipAddresses)
-    print "Finished RDAP lookup"
-    mmIP = MaxMindIPProvider('C:\Users\david\OneDrive\Documents\pythonIPtool\ip_tool\geoIPdatabases\GeoLite2-City_20170404\GeoLite2-City.mmdb')
+    print len(ipAddresses), "IP addresses found in file. Performing GeoIP Lookup"
+
+    mmIP = MaxMindIPProvider('..\\geoipdb\\GeoLite2-City_20170502\\GeoLite2-City.mmdb')
     geoList = [{'ip':ip} for ip in ipAddresses]
     for each in geoList:
         each['city'] = mmIP.getCity(each['ip'])
     print "GeoIPResults: ", geoList
+
+    print "Doing RDAP lookup"
+    results = rdapLookup(ipAddresses)
+    print "Finished RDAP lookup"
 
     queryTool = IPFilter(results)
     queryTool.printHelp()

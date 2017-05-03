@@ -2,6 +2,7 @@ import requests
 import json
 import abc
 import geoip2.database as geodb
+from geoip2.records import City
 
 class GeoIP(object):
     """Make requests for geo IP lookups from freegeoip.net"""
@@ -62,16 +63,27 @@ class MaxMindIPProvider(BaseGEOIPProvider):
     def __init__(self, dbFilename):
         self.cityDB = geodb.Reader(dbFilename)
 
-    def getMaxMindCity(self, ip):
-        return self.cityDB.city(ip)
+    def getCityObject(self, ip):
+        try:
+            return self.cityDB.city(ip)
+        except Exception as e:
+            # return a blank city object if we have trouble
+            return City()
 
     def getCity(self, ip):
-        return self.cityDB.city(ip).city.name
+        return self.getCityObject(ip).name
 
     def getCountry(self, ip):
-        return self.cityDB.city(ip).city.country.name
+        #TODO: Make these methods consistent
+        try:
+            return self.cityDB.city(ip).country.name
+        except:
+            return None
 
     def getLatLon(self, ip):
-        return (self.cityDB.city(ip).location.latitude,
-                self.cityDB.city(ip).location.longitude,
-                self.cityDB.city(ip).location.accuracy_radius)
+        try:
+            location = self.cityDB.city(ip).location
+            rv = (location.latitude,location.longitude, location.accuracy_radius)
+        except Exception as e:
+            rv = (0,0,0)
+        return rv
