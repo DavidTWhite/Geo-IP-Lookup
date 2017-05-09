@@ -71,7 +71,10 @@ class MaxMindIPProvider(BaseGEOIPProvider):
             return City()
 
     def getCity(self, ip):
-        return self.getCityObject(ip).name
+        try:
+            return self.getCityObject(ip).city.name
+        except Exception as e:
+            return ''
 
     def getCountry(self, ip):
         #TODO: Make these methods consistent
