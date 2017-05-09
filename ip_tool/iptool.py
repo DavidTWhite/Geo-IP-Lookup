@@ -1,4 +1,4 @@
-from geo_ip import GeoIP
+from geo_ip import GeoIP, MaxMindIPProvider
 from file_parser import FileParser
 from ip_filter import IPFilter
 from rdap_lookup import RDAPLookup
@@ -18,6 +18,25 @@ def getCombinedDataDict(ip):
     combinedDict = mergeDicts(geolookup.getLocationDict(ip), rdaplookup.getRDAPDict(ip))
     return combinedDict
 
+def getRDAP(ip):
+    rdaplookup = RDAPLookup()
+    return rdaplookup.getRDAPDict(ip)
+
+def rdapLookup(ipList):
+    rdaplookup = RDAPLookup()
+    results = []
+    p = Pool(8)     #Using fewer workers reduces risk of connection refusal from lookup servers
+    numTasks = len(ipList)
+    for i, result in enumerate(p.imap_unordered(getRDAP, ipList), 1):
+        try:
+            sys.stderr.write('\rProgress: {0:.2%}'.format(i/float(numTasks)))
+            results.append(result)
+        except Exception as e:
+            print e
+    p.close()
+    p.join()
+    return results
+
 if __name__ == '__main__':
     try:
         filename = sys.argv[1]
@@ -26,18 +45,17 @@ if __name__ == '__main__':
         filename = raw_input("Please enter a filename to parse IP Addresses from: ")
     parser = FileParser()
     ipAddresses = parser.parseFile(filename)
-    print len(ipAddresses), "IP addresses found in file. Performing GeoIP and RDAP Lookup"
-    results = []
-    p = Pool(8)     #Using fewer workers reduces risk of connection refusal from lookup servers
-    numTasks = len(ipAddresses)
-    for i, result in enumerate(p.imap_unordered(getCombinedDataDict, ipAddresses), 1):
-        try:
-            sys.stderr.write('\rProgress: {0:.2%}'.format(i/float(numTasks)))
-            results.append(result)
-        except Exception as e:
-            print e
-    p.close()
-    p.join()
+    print len(ipAddresses), "IP addresses found in file. Performing GeoIP Lookup"
+
+    mmIP = MaxMindIPProvider('..\\geoipdb\\GeoLite2-City_20170502\\GeoLite2-City.mmdb')
+    geoList = [{'ip':ip} for ip in ipAddresses]
+    for each in geoList:
+        each['city'] = mmIP.getCity(each['ip'])
+    print "GeoIPResults: ", geoList
+
+    print "Doing RDAP lookup"
+    results = rdapLookup(ipAddresses)
+    print "Finished RDAP lookup"
 
     queryTool = IPFilter(results)
     queryTool.printHelp()
