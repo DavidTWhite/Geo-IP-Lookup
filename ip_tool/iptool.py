@@ -11,29 +11,9 @@ import wx
 import pyslip
 import pyslip.gmt_local_tiles as tiles
 
-def mergeDicts(x, y): #Built in way to combine two dictionaries is a python 3 feature
-    z = x.copy()
-    z.update(y)
-    return z
-
 def getRDAP(ip):
     rdaplookup = RDAPLookup()
     return rdaplookup.getRDAPDict(ip)
-
-def rdapLookup(ipList):
-    rdaplookup = RDAPLookup()
-    results = []
-    p = Pool(8)     #Using fewer workers reduces risk of connection refusal from lookup servers
-    numTasks = len(ipList)
-    for i, result in enumerate(p.imap_unordered(getRDAP, ipList), 1):
-        try:
-            sys.stderr.write('\rProgress: {0:.2%}'.format(i/float(numTasks)))
-            results.append(result)
-        except Exception as e:
-            print e
-    p.close()
-    p.join()
-    return results
 
 mmIP = MaxMindIPProvider('..\\geoipdb\\GeoLite2-City_20170502\\GeoLite2-City.mmdb')
 def getIP(ip):
@@ -45,24 +25,24 @@ def getIP(ip):
 MinTileLevel = 0
 
 # initial view level and position
-InitViewLevel = 4
+InitViewLevel = 3
 
-# this will eventually be selectable within the app
-# a selection of cities, position from WikiPedia, etc
-InitViewPosition = (0.0, 51.48)             # Greenwich, England
+InitViewPosition = (250, 30)             # Central US in GMT time coordinate system
 
 LonLatPrecision = 3
 DefaultAppSize = (1100, 770)
-TileSources = [
-               ('BlueMarble tiles', 'pyslip.bm_tiles'),
-               ('GMT tiles', 'pyslip.gmt_local_tiles'),
-               ('ModestMaps tiles', 'pyslip.mm_tiles'),
-               ('MapQuest tiles', 'pyslip.mq_tiles'),
-               ('OpenStreetMap tiles', 'pyslip.osm_tiles'),
-               ('Stamen Toner tiles', 'pyslip.stmt_tiles'),
-               ('Stamen Transport tiles', 'pyslip.stmtr_tiles'),
-               ('Stamen Watercolor tiles', 'pyslip.stmw_tiles'),
-              ]
+# TileSources = [
+#                ('BlueMarble tiles', 'pyslip.bm_tiles'),
+#                ('GMT tiles', 'pyslip.gmt_local_tiles'),
+#                ('ModestMaps tiles', 'pyslip.mm_tiles'),
+#                ('MapQuest tiles', 'pyslip.mq_tiles'),
+#                ('OpenStreetMap tiles', 'pyslip.osm_tiles'),
+#                ('Stamen Toner tiles', 'pyslip.stmt_tiles'),
+#                ('Stamen Transport tiles', 'pyslip.stmtr_tiles'),
+#                ('Stamen Watercolor tiles', 'pyslip.stmw_tiles'),
+#               ]   Need to add support for each tilesets unique version of "latitude and longitude"
+
+TileSources = [ ('GMT tiles', 'pyslip.gmt_local_tiles'),]
 DefaultTileset = 'GMT tiles'
 PackBorder = 0
 
@@ -104,11 +84,9 @@ class AppFrame(wx.Frame):
 
         self.make_gui(self.panel)
 
-        #self.init()
-        #maybe don't need this right now
+        self.init()
 
         self.demo_select_dispatch = {}
-        #TODO define this
 
         self.pyslip.Bind(pyslip.EVT_PYSLIP_SELECT, self.handle_select_event)
         self.pyslip.Bind(pyslip.EVT_PYSLIP_BOXSELECT, self.handle_select_event)
@@ -119,8 +97,9 @@ class AppFrame(wx.Frame):
         tile_menu.Check(item_id, True)
 
     def init(self):
-        self.pyslip.OnSize()
         wx.CallAfter(self.final_setup, InitViewLevel, InitViewPosition)
+        self.pyslip.OnSize()
+        self.Centre()
 
     def final_setup(self, level, position):
         """Perform final setup.
@@ -217,14 +196,13 @@ class AppFrame(wx.Frame):
         ipvalue = self.ipctrl.GetValue()
         lat, lon = getIP(ipvalue)[0:2]
         #TODO we need to do tileset dependent conversion to the geo coordinate system used by that tileset. 
-        # in the case of geo tiles, anything lower than -65 
+        # this conversion works for the GMT tileset 
         if (lon < -65):
             lon += 360
         point = (lon, lat)
-        print point
         self.pyslip.AddPointLayer([point,], map_rel=True, visible=True, show_levels=None, 
         selectable=False, name='<ip point: {0}'.format(ipvalue), radius=4, colour='blue', size = DefaultAppSize)
-        #TODO refactor
+        self.pyslip.GotoPosition(point)
 
     def make_gui_mouse(self, parent):
         """Build the mouse part of the controls part of GUI.
@@ -295,7 +273,6 @@ class AppFrame(wx.Frame):
 
     def handle_level_change(self, event):
         """Handle a pySlip LEVEL event."""
-
         self.map_level.SetValue('%d' % event.level)
 
     ######
