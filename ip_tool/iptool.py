@@ -47,22 +47,22 @@ MinTileLevel = 0
 # initial view level and position
 InitViewLevel = 4
 
-# this will eventually be selectable within the app
-# a selection of cities, position from WikiPedia, etc
 InitViewPosition = (0.0, 51.48)             # Greenwich, England
 
 LonLatPrecision = 3
 DefaultAppSize = (1100, 770)
-TileSources = [
-               ('BlueMarble tiles', 'pyslip.bm_tiles'),
-               ('GMT tiles', 'pyslip.gmt_local_tiles'),
-               ('ModestMaps tiles', 'pyslip.mm_tiles'),
-               ('MapQuest tiles', 'pyslip.mq_tiles'),
-               ('OpenStreetMap tiles', 'pyslip.osm_tiles'),
-               ('Stamen Toner tiles', 'pyslip.stmt_tiles'),
-               ('Stamen Transport tiles', 'pyslip.stmtr_tiles'),
-               ('Stamen Watercolor tiles', 'pyslip.stmw_tiles'),
-              ]
+# TileSources = [
+#                ('BlueMarble tiles', 'pyslip.bm_tiles'),
+#                ('GMT tiles', 'pyslip.gmt_local_tiles'),
+#                ('ModestMaps tiles', 'pyslip.mm_tiles'),
+#                ('MapQuest tiles', 'pyslip.mq_tiles'),
+#                ('OpenStreetMap tiles', 'pyslip.osm_tiles'),
+#                ('Stamen Toner tiles', 'pyslip.stmt_tiles'),
+#                ('Stamen Transport tiles', 'pyslip.stmtr_tiles'),
+#                ('Stamen Watercolor tiles', 'pyslip.stmw_tiles'),
+#               ]   Need to add support for each tilesets unique version of "latitude and longitude"
+
+TileSources = [ ('GMT tiles', 'pyslip.gmt_local_tiles'),]
 DefaultTileset = 'GMT tiles'
 PackBorder = 0
 
@@ -104,11 +104,9 @@ class AppFrame(wx.Frame):
 
         self.make_gui(self.panel)
 
-        #self.init()
-        #maybe don't need this right now
+        self.init()
 
         self.demo_select_dispatch = {}
-        #TODO define this
 
         self.pyslip.Bind(pyslip.EVT_PYSLIP_SELECT, self.handle_select_event)
         self.pyslip.Bind(pyslip.EVT_PYSLIP_BOXSELECT, self.handle_select_event)
@@ -119,8 +117,9 @@ class AppFrame(wx.Frame):
         tile_menu.Check(item_id, True)
 
     def init(self):
-        self.pyslip.OnSize()
         wx.CallAfter(self.final_setup, InitViewLevel, InitViewPosition)
+        self.pyslip.OnSize()
+        self.Centre()
 
     def final_setup(self, level, position):
         """Perform final setup.
@@ -131,6 +130,7 @@ class AppFrame(wx.Frame):
         We do this in a CallAfter() function for those operations that
         must not be done while the GUI is "fluid".
         """
+        print level, position
         self.pyslip.GotoLevelAndPosition(level, position)
 
     def make_gui(self, parent):
@@ -295,7 +295,7 @@ class AppFrame(wx.Frame):
 
     def handle_level_change(self, event):
         """Handle a pySlip LEVEL event."""
-
+        print event.level
         self.map_level.SetValue('%d' % event.level)
 
     ######
