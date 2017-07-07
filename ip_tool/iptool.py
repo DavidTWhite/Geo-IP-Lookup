@@ -196,13 +196,13 @@ class AppFrame(wx.Frame):
         ipvalue = self.ipctrl.GetValue()
         lat, lon = getIP(ipvalue)[0:2]
         #TODO we need to do tileset dependent conversion to the geo coordinate system used by that tileset. 
-        # in the case of geo tiles, anything lower than -65 
+        # this conversion works for the GMT tileset 
         if (lon < -65):
             lon += 360
         point = (lon, lat)
         self.pyslip.AddPointLayer([point,], map_rel=True, visible=True, show_levels=None, 
         selectable=False, name='<ip point: {0}'.format(ipvalue), radius=4, colour='blue', size = DefaultAppSize)
-        #TODO refactor
+        self.pyslip.GotoPosition(point)
 
     def make_gui_mouse(self, parent):
         """Build the mouse part of the controls part of GUI.
