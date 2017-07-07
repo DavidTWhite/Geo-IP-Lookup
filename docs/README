@@ -3,21 +3,7 @@ Tested on Windows 10 with Python 2.7.10
 Requirements:
 Python 2.7
 Requests (http://docs.python-requests.org/en/master/)
+pyslip
+wxPython 2.x (pyslip dependency)
 
-To use, run "python iptool.py <yourInputFile>".
-
-If you do not include an input file you will be prompted for one.
-
-Example usage:
-
-Note that the WHERE clause does not accept multiple condition tuples.
-
-Enter Your Query: GET ['ip','city'] WHERE [('city','==','Denver')]
--------------------
-ip : 158.188.10.164
-city : Denver
--------------------
--------------------
-ip : 50.95.243.120
-city : Denver
--------------------
+To use, run "python iptool.py"
