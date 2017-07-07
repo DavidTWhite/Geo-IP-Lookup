@@ -45,9 +45,9 @@ def getIP(ip):
 MinTileLevel = 0
 
 # initial view level and position
-InitViewLevel = 4
+InitViewLevel = 3
 
-InitViewPosition = (0.0, 51.48)             # Greenwich, England
+InitViewPosition = (250, 30)             # Central US in GMT time coordinate system
 
 LonLatPrecision = 3
 DefaultAppSize = (1100, 770)
