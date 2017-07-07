@@ -130,7 +130,6 @@ class AppFrame(wx.Frame):
         We do this in a CallAfter() function for those operations that
         must not be done while the GUI is "fluid".
         """
-        print level, position
         self.pyslip.GotoLevelAndPosition(level, position)
 
     def make_gui(self, parent):
@@ -221,7 +220,6 @@ class AppFrame(wx.Frame):
         if (lon < -65):
             lon += 360
         point = (lon, lat)
-        print point
         self.pyslip.AddPointLayer([point,], map_rel=True, visible=True, show_levels=None, 
         selectable=False, name='<ip point: {0}'.format(ipvalue), radius=4, colour='blue', size = DefaultAppSize)
         #TODO refactor
@@ -295,7 +293,6 @@ class AppFrame(wx.Frame):
 
     def handle_level_change(self, event):
         """Handle a pySlip LEVEL event."""
-        print event.level
         self.map_level.SetValue('%d' % event.level)
 
     ######
