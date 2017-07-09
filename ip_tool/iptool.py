@@ -192,16 +192,24 @@ class AppFrame(wx.Frame):
                 flag=(wx.LEFT|wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL))
         return box
         
-    def onFind(self, somethin):
+    def onFind(self, event):
+        #TODO make this remember previously queried IP addresses. (with some sort of cache timeout?)
         ipvalue = self.ipctrl.GetValue()
         lat, lon = getIP(ipvalue)[0:2]
-        #TODO we need to do tileset dependent conversion to the geo coordinate system used by that tileset. 
-        # this conversion works for the GMT tileset 
+        #This conversion from real lat/lon to map lat/lon only works for Pyslip 3.0.4 "GMT" tileset. 
         if (lon < -65):
             lon += 360
         point = (lon, lat)
         self.pyslip.AddPointLayer([point,], map_rel=True, visible=True, show_levels=None, 
         selectable=False, name='<ip point: {0}'.format(ipvalue), radius=4, colour='blue', size = DefaultAppSize)
+        textData = [(lon, lat, ipvalue, {'placement': 'sw'})]
+        self.pyslip.AddTextLayer(textData, map_rel=True, 
+                                        name='<text_layer>', 
+                                        visible=True,
+                                        delta=40,
+                                        show_levels=[1,2,3,4,5,6,7],
+                                        placement='sw',
+                                        radius = 0)
         self.pyslip.GotoPosition(point)
 
     def make_gui_mouse(self, parent):
