@@ -200,17 +200,15 @@ class AppFrame(wx.Frame):
         if (lon < -65):
             lon += 360
         point = (lon, lat)
-        self.pyslip.AddPointLayer([point,], map_rel=True, visible=True, show_levels=None, 
-        selectable=False, name='<ip point: {0}'.format(ipvalue), radius=4, colour='blue', size = DefaultAppSize)
         textData = [(lon, lat, ipvalue, {'placement': 'sw'})]
         self.pyslip.AddTextLayer(textData, map_rel=True, 
                                         name='<text_layer>', 
                                         visible=True,
                                         delta=40,
                                         show_levels=[1,2,3,4,5,6,7],
-                                        placement='sw',
-                                        radius = 0)
-        self.pyslip.GotoPosition(point)
+                                        placement='w',
+                                        selectable=True,
+                                        radius = 2)
 
     def make_gui_mouse(self, parent):
         """Build the mouse part of the controls part of GUI.
