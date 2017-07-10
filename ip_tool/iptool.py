@@ -144,11 +144,15 @@ class AppFrame(wx.Frame):
         l_p.Add(mouse, proportion=0, flag=wx.EXPAND|wx.ALL)
         controls.Add(l_p, proportion=0, flag=wx.EXPAND|wx.ALL)
 
-
         ip = wx.BoxSizer(wx.HORIZONTAL)
-        level = self.make_gui_IP_box(parent)
-        ip.Add(level, proportion=0, flag=wx.EXPAND|wx.ALL)
-        controls.Add(ip, proportion=0, flag=wx.EXPAND|wx.ALL)
+        ipEntry = self.make_gui_IP_box(parent)
+        ip.Add(ipEntry, proportion=1, flag=wx.EXPAND|wx.ALL)
+        controls.Add(ip, proportion=1, flag=wx.EXPAND|wx.ALL)
+
+        detailbox = wx.BoxSizer(wx.HORIZONTAL)
+        details = self.make_gui_details(parent)
+        detailbox.Add(details, proportion=1, flag=wx.EXPAND|wx.ALL)
+        controls.Add(detailbox,proportion=1, flag=wx.EXPAND|wx.ALL)
         return controls
 
     def make_gui_level(self, parent):
@@ -192,7 +196,7 @@ class AppFrame(wx.Frame):
     def onFind(self, event):
         #TODO make this remember previously queried IP addresses. (with some sort of cache timeout?)
         ipvalue = self.ipctrl.GetValue()
-        lat, lon = getIP(ipvalue)[0:2]
+        lat, lon = self.geoIP.getLatLon(ipvalue)[0:2]
         #This conversion from real lat/lon to map lat/lon only works for Pyslip 3.0.4 "GMT" tileset. 
         if (lon < -65):
             lon += 360
@@ -206,6 +210,22 @@ class AppFrame(wx.Frame):
                                         placement='w',
                                         selectable=True,
                                         radius = 2)
+        self.updateDetails(ipvalue)
+        self.pyslip.GotoPosition(point)     
+
+    def updateDetails(self, ip):
+        city = self.geoIP.getCity(ip)
+        country = self.geoIP.getCountry(ip)
+        self.ip_details.SetLabel(ip + "\n" + city + "\n" + country)
+
+    def make_gui_details(self, parent):
+        """ Build the ip details box """
+        self.ip_details = wx.StaticText(parent, wx.ID_ANY, "IP\nCity\nCountry")
+        sb = AppStaticBox(parent, "Details")
+        sizer = wx.StaticBoxSizer(sb, orient=wx.HORIZONTAL)
+        sizer.Add(self.ip_details, proportion=1, border=PackBorder,
+                flag=wx.EXPAND)
+        return sizer
 
     def make_gui_mouse(self, parent):
         """Build the mouse part of the controls part of GUI.
@@ -235,8 +255,11 @@ class AppFrame(wx.Frame):
 
     def handle_select_event(self, event):
         """Handle a pySlip point/box SELECT event."""
-        layer_id = event.layer_id
-        self.demo_select_dispatch.get(layer_id, self.null_handler)(event)
+        selection = event.selection
+        if selection:
+            ip = selection[0][2]
+            if ip:
+                self.updateDetails(ip)
 
     def handle_position_event(self, event):
         """Handle a pySlip POSITION event."""
