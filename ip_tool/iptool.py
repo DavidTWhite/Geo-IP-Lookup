@@ -15,10 +15,6 @@ def getRDAP(ip):
     rdaplookup = RDAPLookup()
     return rdaplookup.getRDAPDict(ip)
 
-mmIP = MaxMindIPProvider('..\\geoipdb\\GeoLite2-City_20170502\\GeoLite2-City.mmdb')
-def getIP(ip):
-    return mmIP.getLatLon(ip)
-
 #Stealing straight from the demo
 
 # tiles info
@@ -93,6 +89,7 @@ class AppFrame(wx.Frame):
         self.pyslip.Bind(pyslip.EVT_PYSLIP_POSITION, self.handle_position_event)
         self.pyslip.Bind(pyslip.EVT_PYSLIP_LEVEL, self.handle_level_change)
 
+        self.geoIP = MaxMindIPProvider('..\\geoipdb\\GeoLite2-City_20170502\\GeoLite2-City.mmdb')
         item_id = self.name2guiid[self.default_tileset_name]
         tile_menu.Check(item_id, True)
 
