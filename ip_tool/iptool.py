@@ -215,8 +215,8 @@ class AppFrame(wx.Frame):
 
     def updateDetails(self, ip):
         city = self.geoIP.getCity(ip)
-        country = self.geoIP.getCountry(ip)
-        self.ip_details.SetLabel(ip + "\n" + city + "\n" + country)
+        country = self.geoIP.getCountry(ip)        
+        self.ip_details.SetLabel(ip + "\n" + str(city) + "\n" + str(country))
 
     def make_gui_details(self, parent):
         """ Build the ip details box """
