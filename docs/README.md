@@ -11,3 +11,6 @@ Tested on Windows 10 with Python 2.7.10
 To use, run "python iptool.py"
 
 ![Screenshot](iptoolss1.png)
+
+This product includes GeoLite2 data created by MaxMind, available from
+[http://www.maxmind.com](a href="http://www.maxmind.com")
