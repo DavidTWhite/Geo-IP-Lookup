@@ -11,11 +11,9 @@ import wx
 import pyslip
 import pyslip.gmt_local_tiles as tiles
 
-def getRDAP(ip):
-    rdaplookup = RDAPLookup()
-    return rdaplookup.getRDAPDict(ip)
+from guicontrols import AppStaticBox, ROTextCtrl
 
-#Stealing straight from the demo
+#This code is predominantly from the pyslip demo application
 
 # tiles info
 MinTileLevel = 0
@@ -23,7 +21,7 @@ MinTileLevel = 0
 # initial view level and position
 InitViewLevel = 3
 
-InitViewPosition = (250, 30)             # Central US in GMT time coordinate system
+InitViewPosition = (250, 30)             # Central US in GMT coordinate system
 
 LonLatPrecision = 3
 DefaultAppSize = (1100, 770)
@@ -315,28 +313,7 @@ class AppFrame(wx.Frame):
 
         del self.demo_select_dispatch[id]
 
-class AppStaticBox(wx.StaticBox):
 
-    def __init__(self, parent, label, *args, **kwargs):
-#        if label:
-#            label = '  ' + label + '  '
-        if 'style' not in kwargs:
-            kwargs['style'] = wx.NO_BORDER
-        wx.StaticBox.__init__(self, parent, wx.ID_ANY, label, *args, **kwargs)
-
-# background colour for the 'read-only' text field
-ControlReadonlyColour = '#ffffcc'
-
-class ROTextCtrl(wx.TextCtrl):
-    """Override the wx.TextCtrl widget to get read-only text control which
-    has a distinctive background colour."""
-
-    def __init__(self, parent, value, tooltip='', *args, **kwargs):
-        wx.TextCtrl.__init__(self, parent, wx.ID_ANY, value=value,
-                             style=wx.TE_READONLY, *args, **kwargs)
-        self.SetBackgroundColour(ControlReadonlyColour)
-        self.SetToolTip(wx.ToolTip(tooltip))
-        
 if __name__ == '__main__':
     # start wxPython app
     app = wx.App()
