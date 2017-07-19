@@ -17,15 +17,10 @@ from guicontrols import AppStaticBox, ROTextCtrl
 
 # tiles info
 MinTileLevel = 0
-
-# initial view level and position
 InitViewLevel = 3
-
-InitViewPosition = (250, 30)             # Central US in GMT coordinate system
-
+InitViewPosition = (250, 30)             # Central US in GMT tile coordinate system
 LonLatPrecision = 3
 DefaultAppSize = (1100, 770)
-
 PackBorder = 0
 
 class AppFrame(wx.Frame):
@@ -41,8 +36,6 @@ class AppFrame(wx.Frame):
         self.make_gui(self.panel)
 
         self.init()
-
-        self.demo_select_dispatch = {}
 
         self.pyslip.Bind(pyslip.EVT_PYSLIP_SELECT, self.handle_select_event)
         self.pyslip.Bind(pyslip.EVT_PYSLIP_POSITION, self.handle_position_event)
@@ -92,10 +85,8 @@ class AppFrame(wx.Frame):
         # all controls in vertical box sizer
         controls = wx.BoxSizer(wx.VERTICAL)
 
-        # put level and position into one 'controls' position
+        # put position into one 'controls' position
         l_p = wx.BoxSizer(wx.HORIZONTAL)
-        level = self.make_gui_level(parent)
-        l_p.Add(level, proportion=0, flag=wx.EXPAND|wx.ALL)
         mouse = self.make_gui_mouse(parent)
         l_p.Add(mouse, proportion=0, flag=wx.EXPAND|wx.ALL)
         controls.Add(l_p, proportion=0, flag=wx.EXPAND|wx.ALL)
@@ -110,29 +101,6 @@ class AppFrame(wx.Frame):
         detailbox.Add(details, proportion=1, flag=wx.EXPAND|wx.ALL)
         controls.Add(detailbox,proportion=1, flag=wx.EXPAND|wx.ALL)
         return controls
-
-    def make_gui_level(self, parent):
-        """Build the control that shows the level.
-
-        parent  reference to parent
-
-        Returns reference to containing sizer object.
-        """
-
-        # create objects
-        txt = wx.StaticText(parent, wx.ID_ANY, 'Level: ')
-        self.map_level = ROTextCtrl(parent, '', size=(30,-1),
-                                    tooltip='Shows map zoom level')
-
-        # lay out the controls
-        sb = AppStaticBox(parent, 'Map level')
-        box = wx.StaticBoxSizer(sb, orient=wx.HORIZONTAL)
-        box.Add(txt, border=PackBorder, flag=(wx.ALIGN_CENTER_VERTICAL
-                                              |wx.ALIGN_RIGHT|wx.LEFT))
-        box.Add(self.map_level, proportion=0, border=PackBorder,
-                flag=wx.LEFT|wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL)
-
-        return box
 
     def make_gui_IP_box(self, parent):
         label = wx.StaticText(parent, wx.ID_ANY, 'IP: ')
@@ -227,16 +195,6 @@ class AppFrame(wx.Frame):
                         % (LonLatPrecision, lon, LonLatPrecision, lat))
 
         self.mouse_position.SetValue(posn_str)
-
-    def add_select_handler(self, id, handler):
-        """Add handler for select in layer 'id'."""
-
-        self.demo_select_dispatch[id] = handler
-
-    def del_select_handler(self, id):
-        """Remove handler for select in layer 'id'."""
-
-        del self.demo_select_dispatch[id]
 
 
 if __name__ == '__main__':
