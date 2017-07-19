@@ -30,9 +30,8 @@ PackBorder = 0
 
 class AppFrame(wx.Frame):
     def __init__(self):
-        wx.Frame.__init__(self, None, size=DefaultAppSize, title="IPtool v1")
+        wx.Frame.__init__(self, None, size=DefaultAppSize, title="IPtool v0.7")
         self.SetMinSize(DefaultAppSize)
-        #TODO where did DefaultAppSize come form
         self.panel = wx.Panel(self, wx.ID_ANY)
         self.panel.SetBackgroundColour(wx.WHITE)
         self.panel.ClearBackground()
@@ -46,9 +45,7 @@ class AppFrame(wx.Frame):
         self.demo_select_dispatch = {}
 
         self.pyslip.Bind(pyslip.EVT_PYSLIP_SELECT, self.handle_select_event)
-        self.pyslip.Bind(pyslip.EVT_PYSLIP_BOXSELECT, self.handle_select_event)
         self.pyslip.Bind(pyslip.EVT_PYSLIP_POSITION, self.handle_position_event)
-        self.pyslip.Bind(pyslip.EVT_PYSLIP_LEVEL, self.handle_level_change)
 
         self.geoIP = MaxMindIPProvider('..\\geoipdb\\GeoLite2-City_20170502\\GeoLite2-City.mmdb')
 
@@ -230,14 +227,6 @@ class AppFrame(wx.Frame):
                         % (LonLatPrecision, lon, LonLatPrecision, lat))
 
         self.mouse_position.SetValue(posn_str)
-
-    def handle_level_change(self, event):
-        """Handle a pySlip LEVEL event."""
-        self.map_level.SetValue('%d' % event.level)
-
-    ######
-    # Handle adding/removing select handler functions.
-    ######
 
     def add_select_handler(self, id, handler):
         """Add handler for select in layer 'id'."""
