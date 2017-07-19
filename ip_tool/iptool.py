@@ -25,19 +25,7 @@ InitViewPosition = (250, 30)             # Central US in GMT coordinate system
 
 LonLatPrecision = 3
 DefaultAppSize = (1100, 770)
-# TileSources = [
-#                ('BlueMarble tiles', 'pyslip.bm_tiles'),
-#                ('GMT tiles', 'pyslip.gmt_local_tiles'),
-#                ('ModestMaps tiles', 'pyslip.mm_tiles'),
-#                ('MapQuest tiles', 'pyslip.mq_tiles'),
-#                ('OpenStreetMap tiles', 'pyslip.osm_tiles'),
-#                ('Stamen Toner tiles', 'pyslip.stmt_tiles'),
-#                ('Stamen Transport tiles', 'pyslip.stmtr_tiles'),
-#                ('Stamen Watercolor tiles', 'pyslip.stmw_tiles'),
-#               ]   Need to add support for each tilesets unique version of "latitude and longitude"
 
-TileSources = [ ('GMT tiles', 'pyslip.gmt_local_tiles'),]
-DefaultTileset = 'GMT tiles'
 PackBorder = 0
 
 class AppFrame(wx.Frame):
@@ -48,31 +36,6 @@ class AppFrame(wx.Frame):
         self.panel = wx.Panel(self, wx.ID_ANY)
         self.panel.SetBackgroundColour(wx.WHITE)
         self.panel.ClearBackground()
-
-        menuBar = wx.MenuBar()
-        tile_menu = wx.Menu()
-
-        self.tile_source= None
-        self.id2tiledata = {}
-        self.name2guiid = {}
-
-        self.default_tileset_name = None 
-
-
-        for (name, module_name) in TileSources:
-            new_id = wx.NewId()
-            tile_menu.Append(new_id, name, name, wx.ITEM_RADIO)
-            self.Bind(wx.EVT_MENU, self.onTilesetSelect)
-            self.id2tiledata[new_id] = (name, module_name, None)
-            self.name2guiid[name] = new_id
-            if name == DefaultTileset:
-                self.default_tileset_name = name
-
-        if self.default_tileset_name is None:
-            raise Exception('Bad Tilesources({0}'.format(str(TileSources)))
-
-        menuBar.Append(tile_menu, "&Tileset")
-        self.SetMenuBar(menuBar)
 
         self.tile_source = tiles.Tiles()
 
@@ -88,8 +51,6 @@ class AppFrame(wx.Frame):
         self.pyslip.Bind(pyslip.EVT_PYSLIP_LEVEL, self.handle_level_change)
 
         self.geoIP = MaxMindIPProvider('..\\geoipdb\\GeoLite2-City_20170502\\GeoLite2-City.mmdb')
-        item_id = self.name2guiid[self.default_tileset_name]
-        tile_menu.Check(item_id, True)
 
     def init(self):
         wx.CallAfter(self.final_setup, InitViewLevel, InitViewPosition)
@@ -269,31 +230,6 @@ class AppFrame(wx.Frame):
                         % (LonLatPrecision, lon, LonLatPrecision, lat))
 
         self.mouse_position.SetValue(posn_str)
-
-    def onTilesetSelect(self, event):
-        """User selected a tileset from the menu.
-
-        event  the menu select event
-        """
-
-        menu_id = event.GetId()
-        try:
-            (name, module_name, new_tile_obj) = self.id2tiledata[menu_id]
-        except KeyError:
-            # badly formed self.id2tiledata element
-            raise Exception('self.id2tiledata is badly formed:\n%s'
-                            % str(self.id2tiledata))
-
-        if new_tile_obj is None:
-            # haven't seen this tileset before, import and instantiate
-            module_name = self.id2tiledata[menu_id][1]
-            exec 'import %s as tiles' % module_name
-            new_tile_obj = tiles.Tiles()
-
-            # update the self.id2tiledata element
-            self.id2tiledata[menu_id] = (name, module_name, new_tile_obj)
-
-        self.pyslip.ChangeTileset(new_tile_obj)
 
     def handle_level_change(self, event):
         """Handle a pySlip LEVEL event."""
