@@ -88,8 +88,8 @@ class AppFrame(wx.Frame):
         # put position into one 'controls' position
         l_p = wx.BoxSizer(wx.HORIZONTAL)
         mouse = self.make_gui_mouse(parent)
-        l_p.Add(mouse, proportion=0, flag=wx.EXPAND|wx.ALL)
-        controls.Add(l_p, proportion=0, flag=wx.EXPAND|wx.ALL)
+        l_p.Add(mouse, proportion=1, flag=wx.EXPAND|wx.ALL)
+        controls.Add(l_p, proportion=1, flag=wx.EXPAND|wx.ALL)
 
         ip = wx.BoxSizer(wx.HORIZONTAL)
         ipEntry = self.make_gui_IP_box(parent)
@@ -170,10 +170,10 @@ class AppFrame(wx.Frame):
         sb = AppStaticBox(parent, 'Mouse position')
         box = wx.StaticBoxSizer(sb, orient=wx.HORIZONTAL)
         box.Add(txt, border=PackBorder, flag=(wx.ALIGN_CENTER_VERTICAL
-                                     |wx.ALIGN_RIGHT|wx.LEFT))
+                                     ))
         #box.Add(self.mouse_position, proportion=1, border=PackBorder,
         box.Add(self.mouse_position, proportion=0, border=PackBorder,
-                flag=wx.RIGHT|wx.TOP|wx.BOTTOM)
+                flag=wx.ALIGN_CENTER_VERTICAL)
 
         return box
 
