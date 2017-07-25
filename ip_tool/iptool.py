@@ -22,6 +22,10 @@ InitViewPosition = (250, 30)             # Central US in GMT tile coordinate sys
 LonLatPrecision = 3
 DefaultAppSize = (1100, 770)
 PackBorder = 0
+DETAILTXTFMT = \
+"""IP: {0} 
+City: {1}   
+Country: {2} """
 
 class AppFrame(wx.Frame):
     def __init__(self):
@@ -89,17 +93,17 @@ class AppFrame(wx.Frame):
         l_p = wx.BoxSizer(wx.HORIZONTAL)
         mouse = self.make_gui_mouse(parent)
         l_p.Add(mouse, proportion=1, flag=wx.EXPAND|wx.ALL)
-        controls.Add(l_p, proportion=1, flag=wx.EXPAND|wx.ALL)
+        controls.Add(l_p, proportion=0, flag=wx.EXPAND|wx.ALL)
 
         ip = wx.BoxSizer(wx.HORIZONTAL)
         ipEntry = self.make_gui_IP_box(parent)
         ip.Add(ipEntry, proportion=1, flag=wx.EXPAND|wx.ALL)
-        controls.Add(ip, proportion=1, flag=wx.EXPAND|wx.ALL)
+        controls.Add(ip, proportion=0, flag=wx.EXPAND|wx.ALL)
 
         detailbox = wx.BoxSizer(wx.HORIZONTAL)
         details = self.make_gui_details(parent)
         detailbox.Add(details, proportion=1, flag=wx.EXPAND|wx.ALL)
-        controls.Add(detailbox,proportion=1, flag=wx.EXPAND|wx.ALL)
+        controls.Add(detailbox,proportion=0, flag=wx.EXPAND|wx.ALL)
         return controls
 
     def make_gui_IP_box(self, parent):
@@ -139,15 +143,15 @@ class AppFrame(wx.Frame):
 
     def updateDetails(self, ip):
         city = self.geoIP.getCity(ip)
-        country = self.geoIP.getCountry(ip)        
-        self.ip_details.SetLabel(ip + "\n" + str(city) + "\n" + str(country))
+        country = self.geoIP.getCountry(ip)      
+        self.ip_details.SetLabel(DETAILTXTFMT.format(ip, city, country))
 
     def make_gui_details(self, parent):
         """ Build the ip details box """
-        self.ip_details = wx.StaticText(parent, wx.ID_ANY, "IP\nCity\nCountry")
+        self.ip_details = wx.StaticText(parent, wx.ID_ANY, DETAILTXTFMT.format('','',''))
         sb = AppStaticBox(parent, "Details")
         sizer = wx.StaticBoxSizer(sb, orient=wx.HORIZONTAL)
-        sizer.Add(self.ip_details, proportion=1, border=PackBorder,
+        sizer.Add(self.ip_details, proportion=0, border=PackBorder,
                 flag=wx.EXPAND)
         return sizer
 
